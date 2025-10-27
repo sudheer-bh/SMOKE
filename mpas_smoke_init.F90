@@ -42,14 +42,14 @@ module mpas_smoke_init
 
   subroutine set_scalar_indices( chemistry_start,                                     &
                                  index_smoke_fine, index_smoke_coarse,                &
+                                 index_dust_fine, index_dust_coarse,                  &                  
                                  index_polp_tree, index_polp_grass, index_polp_weed,  &
                                  index_pols_tree, index_pols_grass, index_pols_weed,  &
                                  index_pols_all,  index_polp_all,                     &
                                  index_unspc_fine, index_unspc_coarse,                &
                                  index_ssalt_fine, index_ssalt_coarse,                &
                                  index_no3_a_fine, index_so4_a_fine, index_nh4_a_fine,&
-                                 index_so2, index_nh3, index_ch4,                     &
-                                 index_dust_fine, index_dust_coarse                  )
+                                 index_so2, index_nh3, index_ch4                      )
 
     implicit none
 
