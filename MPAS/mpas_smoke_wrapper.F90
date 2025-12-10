@@ -270,8 +270,8 @@ contains
      real(RKIND),intent(in)           :: dust_drylimit_factor, dust_moist_correction
      integer,intent(in)               :: bb_input_prevh
      integer,intent(in)               :: online_rwc_emis
-     real(RKIND),intent(in)           :: pollen_emis_scale_factor, num_pols_per_polp 
-     real(RKIND),intent(in)           :: tree_pollen_emis_scale_factor, &
+     real(RKIND),intent(in),optional  :: pollen_emis_scale_factor, num_pols_per_polp 
+     real(RKIND),intent(in),optional  :: tree_pollen_emis_scale_factor, &
                                          grass_pollen_emis_scale_factor, &
                                          weed_pollen_emis_scale_factor
 !----------------------------------
