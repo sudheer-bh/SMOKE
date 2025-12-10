@@ -25,6 +25,9 @@ contains
        xland, rainc, rainnc, relhum,                             &
        swdown, total_flashrate, cldfrac,                         &
        num_pols_per_polp, pollen_emis_scale_factor,              &
+       tree_pollen_emis_scale_factor,                            &
+       grass_pollen_emis_scale_factor,                           &
+       weed_pollen_emis_scale_factor,                            &
        e_bio_in, e_bio_out, kbio,                                &
        num_e_bio_in, num_e_bio_out,                              &
        index_e_bio_in_polp_tree,                                 &
@@ -87,7 +90,10 @@ contains
     REAL(RKIND), DIMENSION( ims:ime, kms:kme, jms:jme, 1:num_e_bio_out ),               &
            INTENT(INOUT) :: e_bio_out                                  
 ! namelist
-    REAL(RKIND), INTENT(IN) :: pollen_emis_scale_factor, num_pols_per_polp
+    REAL(RKIND), INTENT(IN) :: pollen_emis_scale_factor, num_pols_per_polp,    &
+                               tree_pollen_emis_scale_factor,                  &
+                               grass_pollen_emis_scale_factor,                 &
+                               weed_pollen_emis_scale_factor
 
 ! local variables
     INTEGER     :: i, j, k, l, l_oc,ibin                                     
@@ -215,20 +221,24 @@ contains
        factaa = dt / ( dz8w(i,kts,j) * rho(i,kts,j) )
 
      ! Compute the mass emissions, update the diagnostic and chemistry arrays
-       emis = pollen_emis_scale_factor * factaa * ppemfact_mass_tree
+       emis = tree_pollen_emis_scale_factor * pollen_emis_scale_factor * factaa * ppemfact_mass_tree
        e_bio_out(i,kts,j,index_e_bio_out_polp_tree)  = e_bio_out(i,kts,j,index_e_bio_out_polp_tree) + emis
        if (p_polp_tree .gt. 0)   chem(i,kts,j,p_polp_tree)  = chem(i,kts,j,p_polp_tree) + emis
 
-       emis = pollen_emis_scale_factor * factaa * ppemfact_mass_grass
+       emis = grass_pollen_emis_scale_factor * pollen_emis_scale_factor * factaa * ppemfact_mass_grass
        e_bio_out(i,kts,j,index_e_bio_out_polp_grass)  = e_bio_out(i,kts,j,index_e_bio_out_polp_grass) + emis
        if (p_polp_grass .gt. 0)  chem(i,kts,j,p_polp_grass)  = chem(i,kts,j,p_polp_grass) + emis
 
-       emis = pollen_emis_scale_factor * factaa * ppemfact_mass_weed
+       emis = weed_pollen_emis_scale_factor * pollen_emis_scale_factor * factaa * ppemfact_mass_weed
        e_bio_out(i,kts,j,index_e_bio_out_polp_weed)  = e_bio_out(i,kts,j,index_e_bio_out_polp_weed) + emis
        if (p_polp_weed .gt. 0)  chem(i,kts,j,p_polp_weed)  = chem(i,kts,j,p_polp_weed) + emis
 
-       emis = pollen_emis_scale_factor * factaa * (ppemfact_mass_tree + ppemfact_mass_grass + ppemfact_mass_weed) 
-       if (p_polp_all .gt. 0)   chem(i,kts,j,p_polp_all)   = chem(i,kts,j,p_polp_all)  + emis
+       if (p_polp_all .gt. 0) then
+          emis = pollen_emis_scale_factor * factaa * &
+                (tree_pollen_emis_scale_factor * ppemfact_mass_tree + &
+                 grass_pollen_emis_scale_factor * ppemfact_mass_grass + &
+                 weed_pollen_emis_scale_factor * ppemfact_mass_weed) 
+          chem(i,kts,j,p_polp_all)   = chem(i,kts,j,p_polp_all)  + emis
 
      endif ! if land
 

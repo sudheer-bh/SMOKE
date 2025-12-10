@@ -93,6 +93,8 @@ contains
            dust_alpha            , dust_gamma            , dust_drylimit_factor ,            &
            dust_moist_correction ,                                                           &
            num_pols_per_polp     , pollen_emis_scale_factor,                                 &
+           tree_pollen_emis_scale_factor, grass_pollen_emis_scale_factor        ,            &
+           weed_pollen_emis_scale_factor,                                                    &
            bb_input_prevh        , online_rwc_emis,   rwc_emis_scale_factor,                 &
            RWC_denominator       , RWC_annual_sum       ,                                    &
            RWC_annual_sum_smoke_fine, RWC_annual_sum_smoke_coarse,                           &
@@ -268,7 +270,10 @@ contains
      real(RKIND),intent(in)           :: dust_drylimit_factor, dust_moist_correction
      integer,intent(in)               :: bb_input_prevh
      integer,intent(in)               :: online_rwc_emis
-     real(RKIND),intent(in)           :: pollen_emis_scale_factor, num_pols_per_polp 
+     real(RKIND),intent(in),optional  :: pollen_emis_scale_factor, num_pols_per_polp 
+     real(RKIND),intent(in),optional  :: tree_pollen_emis_scale_factor, &
+                                         grass_pollen_emis_scale_factor, &
+                                         weed_pollen_emis_scale_factor
 !----------------------------------
 !>-- Local Variables
 !>-- 3D met
@@ -564,6 +569,9 @@ contains
        xland, raincv, rainncv, relhum, swdown, total_flashrate,       &
        cldfrac,                                                       &
        num_pols_per_polp,pollen_emis_scale_factor,                    &
+       tree_pollen_emis_scale_factor,                                 &
+       grass_pollen_emis_scale_factor,                                &
+       weed_pollen_emis_scale_factor,                                 &
        e_bio_in, e_bio_out, kbio,                                     &
        num_e_bio_in, num_e_bio_out,                                   &
        index_e_bio_in_polp_tree,                                      &
