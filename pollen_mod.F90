@@ -239,6 +239,7 @@ contains
                  grass_pollen_emis_scale_factor * ppemfact_mass_grass + &
                  weed_pollen_emis_scale_factor * ppemfact_mass_weed) 
           chem(i,kts,j,p_polp_all)   = chem(i,kts,j,p_polp_all)  + emis
+       endif
 
      endif ! if land
 
