@@ -348,7 +348,7 @@ subroutine particle_settling_wrapper(tend_chem_settle,chem,rho_phy,delz_flip,vg,
      ! -- NOTE, diameters and densities are NOT converted to cm and g/cm3 like in Emerson
      vsettl = four_ninths * gravity * aero_dens(nv) * ( growth_fac * ( 0.5_RKIND * aero_diam(nv) ))**2.0_RKIND * one_over_dyn_visc
 
-     do j = jte,jte
+     do j = jts,jte
      do i = its,ite
 !     dzmin = delz(i,kts,j)
      dzmin = delz_flip(i,kte,j)
@@ -387,5 +387,8 @@ subroutine particle_settling_wrapper(tend_chem_settle,chem,rho_phy,delz_flip,vg,
      enddo ! i
      enddo ! j
      enddo ! nv
+
+
+
 end subroutine particle_settling_wrapper
 end module dep_dry_mod_emerson

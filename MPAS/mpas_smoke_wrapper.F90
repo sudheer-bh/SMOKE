@@ -91,6 +91,7 @@ contains
            do_mpas_smoke         , do_mpas_dust          , do_mpas_pollen        ,           &
            do_mpas_anthro        , do_mpas_ssalt         , do_mpas_volc          ,           &
            do_mpas_sna           , do_mpas_methane       , do_mpas_hab           ,           &
+           do_mpas_rwc           ,                                                           &
            calc_bb_emis_online   , bb_beta               ,                                   &
            hwp_method            , hwp_alpha             , wetdep_ls_opt        ,            &
            wetdep_ls_alpha       , plumerise_opt         , plume_wind_eff       ,            &
@@ -102,7 +103,7 @@ contains
            num_pols_per_polp     , pollen_emis_scale_factor,                                 &
            tree_pollen_emis_scale_factor, grass_pollen_emis_scale_factor        ,            &
            weed_pollen_emis_scale_factor,                                                    &
-           bb_input_prevh        , online_rwc_emis,   rwc_emis_scale_factor,                 &
+           bb_input_prevh        , rwc_emis_scale_factor,                 &
            RWC_denominator       , RWC_annual_sum       ,                                    &
            RWC_annual_sum_smoke_fine, RWC_annual_sum_smoke_coarse,                           &
            RWC_annual_sum_unspc_fine, RWC_annual_sum_unspc_coarse,                           &
@@ -262,6 +263,7 @@ contains
      logical,intent(in)               :: do_mpas_sna
      logical,intent(in)               :: do_mpas_methane
      logical,intent(in)               :: do_mpas_hab
+     logical,intent(in)               :: do_mpas_rwc
      character(len=*),intent(in)      :: config_extra_chemical_tracers
      logical,intent(in)               :: config_ultrafine, config_coarse
      logical,intent(in)               :: calc_bb_emis_online
@@ -284,7 +286,6 @@ contains
      real(RKIND),intent(in)           :: dust_alpha, dust_gamma
      real(RKIND),intent(in)           :: dust_drylimit_factor, dust_moist_correction
      integer,intent(in)               :: bb_input_prevh
-     integer,intent(in)               :: online_rwc_emis
      real(RKIND),intent(in),optional  :: pollen_emis_scale_factor, num_pols_per_polp 
      real(RKIND),intent(in),optional  :: tree_pollen_emis_scale_factor, &
                                          grass_pollen_emis_scale_factor, &
@@ -348,7 +349,8 @@ contains
     if ( (.not. do_mpas_smoke) .and. (.not. do_mpas_pollen) .and. &
          (.not. do_mpas_dust ) .and. (.not. do_mpas_anthro) .and. &
          (.not. do_mpas_ssalt) .and. (.not. do_mpas_sna)    .and. &
-         (.not. do_mpas_methane) .and. (.not. do_mpas_hab) )  return
+         (.not. do_mpas_methane) .and. (.not. do_mpas_hab)  .and. &
+         (.not. do_mpas_rwc) )  return
 ! 
    if (ktau == 1) then
 !   Reorder chemistry indices
@@ -667,12 +669,12 @@ contains
     if  (do_timing) call mpas_timer_stop('anthro_driver')
     endif
 
-    if ( online_rwc_emis .gt. 0 ) then
-       call mpas_log_write( ' Calling online residential wood combustion  driver')
-       call mpas_smoke_rwc_emis_driver(dt,gmt,julday,krwc,           &
-            xlat,xlong, chem,num_chem,dz8w,t_phy,rho_phy,             &
+    if ( do_mpas_rwc ) then
+       call mpas_log_write( ' Calling online residential wood combustion driver')
+       call mpas_smoke_rwc_emis_driver(ktau,dt,gmt,julday,krwc,            &
+            xlat,xlong, xland, chem,num_chem,dz8w,t_phy,rho_phy,      &
             rwc_emis_scale_factor,                                    &
-            online_rwc_emis, RWC_denominator, RWC_annual_sum,         &
+            RWC_denominator, RWC_annual_sum,         &
             RWC_annual_sum_smoke_fine, RWC_annual_sum_smoke_coarse,   &
             RWC_annual_sum_unspc_fine, RWC_annual_sum_unspc_coarse,   &
             e_ant_out, num_e_ant_out,         &
