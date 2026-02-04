@@ -64,6 +64,7 @@ contains
 
    REAL(RKIND), PARAMETER :: rwc_t_thresh = 283.15_RKIND ! [ 50 F]
    REAL(RKIND), PARAMETER :: spd_r = 1./86400._RKIND
+   REAL(RKIND), PARAMETER :: emis_max = 1.0_RKIND
 
 ! TODO, read in TBL or define otherwise  
    rwc_t_thresh_grid(:,:) = rwc_t_thresh
@@ -85,12 +86,12 @@ contains
         ! Calculate the fraction of total emisisons based on the linear equation, convert from /day to /sec
          frac = (42.12_RKIND - 0.79_RKIND*t_phy_f) / RWC_denominator(i,j) * spd_r
          if ( p_smoke_fine .gt. 0 .and. index_e_ant_out_smoke_fine .gt. 0 ) then
-            emis = rwc_emis_scale_factor * conv_aer * frac * RWC_annual_sum_smoke_fine(i,1,j)
+            emis = min(rwc_emis_scale_factor * conv_aer * frac * RWC_annual_sum_smoke_fine(i,1,j),emis_max)
             chem(i,kemit,j,p_smoke_fine) = chem(i,kemit,j,p_smoke_fine) + emis
             e_ant_out(i,kemit,j,index_e_ant_out_smoke_fine) = e_ant_out(i,kemit,j,index_e_ant_out_smoke_fine) + emis
          endif
          if ( (p_smoke_coarse .gt. 0 .or. p_unspc_coarse .gt. 0 ) .and. index_e_ant_out_smoke_coarse .gt. 0 ) then
-            emis = rwc_emis_scale_factor * conv_aer * frac * RWC_annual_sum_smoke_coarse(i,1,j)
+            emis = min(rwc_emis_scale_factor * conv_aer * frac * RWC_annual_sum_smoke_coarse(i,1,j),emis_max)
             if ( p_smoke_coarse .gt. 0 ) then
                     chem(i,kemit,j,p_smoke_coarse) = chem(i,kemit,j,p_smoke_coarse) + emis
             elseif ( p_unspc_coarse .gt. 0 ) then
@@ -99,12 +100,12 @@ contains
             e_ant_out(i,kemit,j,index_e_ant_out_smoke_coarse) =  e_ant_out(i,kemit,j,index_e_ant_out_smoke_coarse) + emis
          endif
          if ( p_unspc_fine .gt. 0 .and. index_e_ant_out_unspc_fine .gt. 0 ) then
-              emis = rwc_emis_scale_factor * conv_aer * frac * RWC_annual_sum_unspc_fine(i,1,j)
+              emis = min(rwc_emis_scale_factor * conv_aer * frac * RWC_annual_sum_unspc_fine(i,1,j),emis_max)
               chem(i,kemit,j,p_unspc_fine) = chem(i,kemit,j,p_unspc_fine) + emis
               e_ant_out(i,kemit,j,index_e_ant_out_unspc_fine) = e_ant_out(i,kemit,j,index_e_ant_out_unspc_fine) + emis
          endif
          if ( p_unspc_coarse .gt. 0 .and. index_e_ant_out_unspc_coarse .gt. 0 ) then
-              emis = rwc_emis_scale_factor * conv_aer * frac * RWC_annual_sum_unspc_coarse(i,1,j)
+              emis = min(rwc_emis_scale_factor * conv_aer * frac * RWC_annual_sum_unspc_coarse(i,1,j),emis_max)
               chem(i,kemit,j,p_unspc_coarse) = chem(i,kemit,j,p_unspc_coarse) + emis
               e_ant_out(i,kemit,j,index_e_ant_out_unspc_coarse) = e_ant_out(i,kemit,j,index_e_ant_out_unspc_coarse) + emis
          endif

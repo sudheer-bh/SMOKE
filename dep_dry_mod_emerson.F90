@@ -128,7 +128,7 @@ contains
        do k = kts, kte
        do i = its, ite
           airkinvisc(i,k,j)  = ( 1.8325e-4_RKIND * ( 416.16_RKIND / ( t_phy(i,k,j) + 120._RKIND) ) *   &
-                       ( ( t_phy(i,k,j) / 296.16_RKIND )**1.5_RKIND ) ) / rho_phy(i,k,j) ! Convert density to mol/cm^3
+                       ( ( t_phy(i,k,j) / 296.16_RKIND )**1.5_RKIND ) ) / (rho_phy(i,k,j) * 1.e-3_RKIND) ! Convert density to mol/cm^3
           ! Air molecular freepath (cm)  
           freepath(i,k,j)    = 7.39758e-4_RKIND * airkinvisc(i,k,j) / sqrt( t_phy(i,k,j) )
 !          delz_flip(i,k,j)   = delz(i,kte-kts+k,j)
@@ -150,7 +150,7 @@ contains
              Cc = 1._RKIND + 2._RKIND * freepath(i,k,j) / dp * ( 1.257_RKIND + 0.4_RKIND*exp( -0.55_RKIND * dp / freepath(i,k,j) ) )
              ! Gravitational Settling
              vg(i,k,j,nv) = aerodens * dp * dp * g100 * Cc / &       ! Convert gravity to cm/s^2
-                    ( 18._RKIND * airkinvisc(i,k,j) * rho_phy(i,k,j) ) ! Convert density to mol/cm^
+                    ( 18._RKIND * airkinvisc(i,k,j) * (rho_phy(i,k,j)*1.e-3_RKIND) ) ! Convert density to mol/cm^
           enddo
           enddo
           enddo
@@ -169,7 +169,7 @@ contains
                 ! Cunningham correction factor
                 Cc = 1._RKIND + 2._RKIND * freepath(i,k,j) / dp * ( 1.257_RKIND + 0.4_RKIND*exp( -0.55_RKIND * dp / freepath(i,k,j) ) )
                 ! Brownian Diffusion
-                DDp = ( boltzmann * t_phy(i,k,j) ) * Cc / (3._RKIND * pi * airkinvisc(i,k,j) * rho_phy(i,k,j)  * dp) ! Convert density to mol/cm^3
+                DDp = ( boltzmann * t_phy(i,k,j) ) * Cc / (3._RKIND * pi * airkinvisc(i,k,j) * (rho_phy(i,k,j)*1.e-3_RKIND)  * dp) ! Convert density to mol/cm^3
                 ! Schmit number
                 Sc = airkinvisc(i,k,j) / DDp
                 ! Brownian Diffusion
@@ -273,51 +273,6 @@ end subroutine depvel
 !
 !--------------------------------------------------------------------------------
 !
-!subroutine particle_settling(tend_chem_settle,chem,rho_phy,delz_flip,vg,dt_settl,ndt_settl,   &
-!                             kts,kte,its,ite,jts,jte,num_chem,ims,ime, jms,jme, kms,kme       )
-!     IMPLICIT NONE
-!     
-!     INTEGER, INTENT(IN ) :: kts, kte,its,ite,jts,jte,num_chem,ims,ime, jms,jme, kms,kme 
-!     REAL(RKIND), DIMENSION(ims:ite,kms:kme,jms:jme), INTENT (IN)  :: rho_phy
-!     REAL(RKIND), DIMENSION(ims:ite,kts:kte,jts:jte), INTENT (IN)  :: delz_flip
-!     REAL(RKIND), DIMENSION(ims:ime,kms:kme,jms:jme,1:num_chem), INTENT(IN) :: chem
-!     REAL(RKIND), DIMENSION(its:ite,kts:kte,jts:jte,1:num_chem), INTENT(IN) :: vg
-!     REAL(RKIND), DIMENSION(its:ite,jts:jte,1:num_chem),INTENT(IN) :: dt_settl
-!     INTEGER,     DIMENSION(its:ite,jts:jte,1:num_chem),INTENT(IN) :: ndt_settl
-!     REAL(RKIND), DIMENSION(ims:ime,kms:kme,jms:jme,1:num_chem), INTENT(INOUT) :: tend_chem_settle
-!!
-!!--- Local------
-!     INTEGER :: k,n,l2,i,j,nv,num_loops
-!     REAL(RKIND) :: temp_tc, transfer_to_below_level, vd_wrk1, cblk
-!
-!     do nv = 1,num_chem
-!     if (nv .eq. p_ch4) cycle  ! At some point we'll do something different for gasses
-!     do j = jte,jte
-!     do i = its,ite
-!     num_loops = ndt_settl(i,j,nv)
-!     do n = 1,num_loops
-!     transfer_to_below_level = 0._RKIND
-!     do k = kte,kts,-1
-!        l2 = kte - k + 1
-!     
-!        temp_tc = chem(i,k,j,nv)
-!     
-!        vd_wrk1 = dt_settl(i,j,nv) * vg(i,k,j,nv)*1.e-2_RKIND / delz_flip(i,l2,j)               ! convert vg to m/s
-!     
-!        temp_tc = temp_tc * (1._RKIND - vd_wrk1) + transfer_to_below_level
-!        if (k.gt.kts) then
-!            transfer_to_below_level =(chem(i,k,j,nv)*vd_wrk1)*((delz_flip(i,l2,j) &
-!                        *rho_phy(i,k,j))/(delz_flip(i,l2+1,j)*rho_phy(i,k-1,j)))          ! [ug/kg]
-!        endif
-!        tend_chem_settle(i,k,j,nv) = tend_chem_settle(i,k,j,nv) + (temp_tc - chem(i,k,j,nv))
-!     enddo ! k
-!     enddo ! n
-!     enddo ! i
-!     enddo ! j
-!     enddo ! nv
-!end subroutine particle_settling
-
-!
 subroutine particle_settling_wrapper(tend_chem_settle,chem,rho_phy,delz_flip,vg,  &
                              dt, kts,kte,its,ite,jts,jte,num_chem,ims,ime, jms,jme, kms,kme       )
      IMPLICIT NONE
@@ -350,8 +305,10 @@ subroutine particle_settling_wrapper(tend_chem_settle,chem,rho_phy,delz_flip,vg,
 
      do j = jts,jte
      do i = its,ite
-!     dzmin = delz(i,kts,j)
-     dzmin = delz_flip(i,kte,j)
+     dzmin = delz_flip(i,kts,j)
+     do k = kts,kte
+        dzmin = min(dzmin,delz_flip(i,k,j))
+     enddo
      ! -- Get necessary info for settling
      ! -- Determine the maximum time-step satisying the CFL condition:
      ! -- dt_settl calculations (from original coarsepm_settling)
@@ -377,7 +334,7 @@ subroutine particle_settling_wrapper(tend_chem_settle,chem,rho_phy,delz_flip,vg,
      
         temp_tc = temp_tc * (1._RKIND - vd_wrk1) + transfer_to_below_level
         if ( k .gt. kts ) then
-        transfer_to_below_level =(chem(i,k,j,nv)*vd_wrk1)*((delz_flip(i,l2,j) &
+        transfer_to_below_level =(temp_tc*vd_wrk1)*((delz_flip(i,l2,j) &
                         *rho_phy(i,k,j))/(delz_flip(i,l2+1,j)*rho_phy(i,k-1,j)))          ! [ug/kg]
         endif
         tend_chem_settle(i,k,j,nv) = tend_chem_settle(i,k,j,nv) + (temp_tc - chem(i,k,j,nv))
