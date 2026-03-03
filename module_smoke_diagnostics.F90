@@ -52,7 +52,7 @@ contains
 
   end subroutine mpas_aod_diag
 
-  subroutine mpas_int_sm_diag(chem,int_sm,centroid_h,sm_top,sm_bot,  &
+  subroutine mpas_int_sm_diag(chem,int_sm,sm_centroid_h,sm_top,sm_bot,  &
                                   rho_phy,dz8w,num_chem,z_at_w,     &
                                   ids,ide, jds,jde, kds,kde,        &
                                   ims,ime, jms,jme, kms,kme,        &
@@ -67,7 +67,7 @@ contains
 
   REAL(RKIND), DIMENSION(ims:ime,kms:kme,jms:jme), INTENT(IN) :: rho_phy, dz8w, z_at_w
   REAL(RKIND), DIMENSION(ims:ime,kms:kme,jms:jme,1:num_chem), INTENT(IN) :: chem
-  REAL(RKIND), DIMENSION(ims:ime,jms:jme), INTENT(INOUT) :: int_sm, centroid_h, sm_top, sm_bot
+  REAL(RKIND), DIMENSION(ims:ime,jms:jme), INTENT(INOUT) :: int_sm, sm_centroid_h, sm_top, sm_bot
 
   real(RKIND), parameter :: smoke_threshold = 1.0e-9
 
@@ -76,7 +76,7 @@ contains
   sm_top(:,:)     = 0.0_RKIND
   sm_bot(:,:)     = -1.0_RKIND
   int_sm(:,:)     = 0._RKIND
-  centroid_h(:,:) = 0._RKIND
+  sm_centroid_h(:,:) = 0._RKIND
 
   real(RKIND) :: layer_mass
 
@@ -100,7 +100,7 @@ contains
             int_sm(i,j) = int_sm(i,j) + layer_mass
             
             ! Accumulate mass-weighted height
-            centroid_h(i,j) = centroid_h(i,j) + (layer_mass * z_at_w(i,k,j))
+            sm_centroid_h(i,j) = sm_centroid_h(i,j) + (layer_mass * z_at_w(i,k,j))
           enddo
         enddo
       enddo
@@ -113,9 +113,9 @@ contains
   do j = jts, jte
     do i = its, ite
       if (int_sm(i,j) > 1.e-12_RKIND) then 
-         centroid_h(i,j) = centroid_h(i,j) / int_sm(i,j)
+         sm_centroid_h(i,j) = sm_centroid_h(i,j) / int_sm(i,j)
       else ! zero for clear air
-         centroid_h(i,j) = 0.0_RKIND
+         sm_centroid_h(i,j) = 0.0_RKIND
       endif
     enddo
   enddo
