@@ -120,7 +120,7 @@ contains
     enddo
   enddo
 
-  end subroutine mpas_intsm_diag
+  end subroutine mpas_int_sm_diag
 
   subroutine mpas_visibility_diag(qcloud,qrain,qice,qsnow,qgrpl,    &
                                   blcldw,blcldi,                    &
