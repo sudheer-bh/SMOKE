@@ -110,6 +110,7 @@ contains
            nwfa                  , nifa                 ,  vis                  ,            &
            qc_vis, qr_vis, qi_vis, qs_vis, qg_vis, blcldw_vis, blcldi_vis,                   &
            hno3_bkgd             , coszen                , aod3d_smoke, aod3d   ,            &
+           int_sm                , sm_centroid_h         , sm_bot               , sm_top ,   &
            ktau                  , dt                    , dxcell               ,            &
            area                  ,                                                           &
            xland                 , u10                   , v10                  ,            &
@@ -242,6 +243,7 @@ contains
     real(RKIND),intent(inout), dimension(ims:ime, jms:jme, 1:num_chem),optional :: ddvel
 ! 2D output arrays
     real(RKIND),intent(inout), dimension(ims:ime, jms:jme),optional                   :: vis
+    real(RKIND),intent(inout), dimension(ims:ime, jms:jme),optional                   :: sm_centroid_h, int_sm, sm_bot, sm_top
 ! 3D output emissions
     real(RKIND),intent(inout), dimension(ims:ime, kms:kme, jms:jme,1:num_e_ant_out),optional   :: e_ant_out
     real(RKIND),intent(inout), dimension(ims:ime, kms:kme, jms:jme,1:num_e_bb_out),optional    :: e_bb_out
@@ -743,6 +745,12 @@ contains
                                   rh2m,relhum,qv, &
                                   t2m,t_phy, &
                                   coszen,aod3d,vis,                 &
+                                  ids,ide, jds,jde, kds,kde,        &
+                                  ims,ime, jms,jme, kms,kme,        &
+                                  its,ite, jts,jte, kts,kte         )
+    call mpas_log_write( ' Calculating Smoke diags ')
+    call mpas_int_sm_diag(        chem,int_sm,sm_centroid_h,sm_top,sm_bot,  &
+                                  rho_phy,dz8w,num_chem,z_at_w,     &
                                   ids,ide, jds,jde, kds,kde,        &
                                   ims,ime, jms,jme, kms,kme,        &
                                   its,ite, jts,jte, kts,kte         )
