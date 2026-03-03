@@ -14,7 +14,7 @@ module module_smoke_diagnostics
 
   private
 
-  public :: mpas_aod_diag, mpas_visibility_diag
+  public :: mpas_aod_diag, mpas_visibility_diag, mpas_int_sm_diag
 
 contains
   subroutine mpas_aod_diag(chem,aod3d,rho_phy,dz8w,num_chem,        &
@@ -51,6 +51,76 @@ contains
   enddo
 
   end subroutine mpas_aod_diag
+
+  subroutine mpas_int_sm_diag(chem,int_sm,centroid_h,sm_top,sm_bot,  &
+                                  rho_phy,dz8w,num_chem,z_at_w,     &
+                                  ids,ide, jds,jde, kds,kde,        &
+                                  ims,ime, jms,jme, kms,kme,        &
+                                  its,ite, jts,jte, kts,kte         )
+
+   IMPLICIT NONE
+
+   INTEGER,      INTENT(IN   ) :: ids,ide, jds,jde, kds,kde,         &
+                                  ims,ime, jms,jme, kms,kme,         &
+                                  its,ite, jts,jte, kts,kte,         &
+                                  num_chem
+
+  REAL(RKIND), DIMENSION(ims:ime,kms:kme,jms:jme), INTENT(IN) :: rho_phy, dz8w, z_at_w
+  REAL(RKIND), DIMENSION(ims:ime,kms:kme,jms:jme,1:num_chem), INTENT(IN) :: chem
+  REAL(RKIND), DIMENSION(ims:ime,jms:jme), INTENT(INOUT) :: int_sm, centroid_h, sm_top, sm_bot
+
+  real(RKIND), parameter :: smoke_threshold = 1.0e-9
+
+  integer:: i,k,j,nv
+
+  sm_top(:,:)     = 0.0_RKIND
+  sm_bot(:,:)     = -1.0_RKIND
+  int_sm(:,:)     = 0._RKIND
+  centroid_h(:,:) = 0._RKIND
+
+  real(RKIND) :: layer_mass
+
+  do nv = 1, num_chem
+    if ( nv == p_smoke_fine .or. nv == p_smoke_coarse ) then
+      do j = jts, jte
+        do i = its, ite
+          do k = kts, kte
+
+            if (chem(i,k,j,nv) > smoke_threshold) then
+             if (sm_bot(i,j) < 0.0_RKIND) then
+                sm_bot(i,j) = z_at_w(i,k,j) ! Smoke layer bottom MSL
+             endif
+             sm_top(i,j) = z_at_w(i,k,j) ! Smoke layer top MSL
+            endif
+
+            ! mass increment for the layer
+            layer_mass = 1.e-6_RKIND * chem(i,k,j,nv) * rho_phy(i,k,j) * dz8w(i,k,j)
+            
+            ! column integrated smoke
+            int_sm(i,j) = int_sm(i,j) + layer_mass
+            
+            ! Accumulate mass-weighted height
+            centroid_h(i,j) = centroid_h(i,j) + (layer_mass * z_at_w(i,k,j))
+          enddo
+        enddo
+      enddo
+    endif
+  enddo
+
+  ! Sanity check
+  where (sm_bot < 0.0_RKIND) sm_bot = 0.0_RKIND
+
+  do j = jts, jte
+    do i = its, ite
+      if (int_sm(i,j) > 1.e-12_RKIND) then 
+         centroid_h(i,j) = centroid_h(i,j) / int_sm(i,j)
+      else ! zero for clear air
+         centroid_h(i,j) = 0.0_RKIND
+      endif
+    enddo
+  enddo
+
+  end subroutine mpas_intsm_diag
 
   subroutine mpas_visibility_diag(qcloud,qrain,qice,qsnow,qgrpl,    &
                                   blcldw,blcldi,                    &
