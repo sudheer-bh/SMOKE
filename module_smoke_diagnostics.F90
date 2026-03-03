@@ -72,13 +72,12 @@ contains
   real(RKIND), parameter :: smoke_threshold = 1.0e-9
 
   integer:: i,k,j,nv
+  real(RKIND) :: layer_mass
 
   sm_top(:,:)     = 0.0_RKIND
   sm_bot(:,:)     = -1.0_RKIND
   int_sm(:,:)     = 0._RKIND
   sm_centroid_h(:,:) = 0._RKIND
-
-  real(RKIND) :: layer_mass
 
   do nv = 1, num_chem
     if ( nv == p_smoke_fine .or. nv == p_smoke_coarse ) then
