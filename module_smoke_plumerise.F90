@@ -2254,7 +2254,7 @@ end subroutine plumerise_sofiev
 
 subroutine plumerise_briggs(kte, u_in, v_in, w_in, theta_in, pi_in, rho_in, qv_in, &
                                  zmid, z_lev, frp_w, lat, lon, k_min, k_max, ierr,      &
-                                 kpbl_in, cp_in)
+                                 kpbl_in, cp_in, k2_b69, k2_b84, hp_b69, hp_b84)
   use mpas_kind_types
   implicit none
 
@@ -2280,8 +2280,8 @@ subroutine plumerise_briggs(kte, u_in, v_in, w_in, theta_in, pi_in, rho_in, qv_i
   integer :: regime   ! 1=stable, 2=neutral, 3=unstable
   real(RKIND) :: Hp69, Hp84
   real(RKIND) :: cp_used
-  integer :: k2_b69, k2_b84
-  real(RKIND) :: hp_b69, hp_b84 
+  integer, intent(out), optional :: k2_b69, k2_b84
+  real(RKIND), intent(out), optional :: hp_b69, hp_b84
 
   ierr = 0
   k_min = 2
