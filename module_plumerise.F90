@@ -130,26 +130,26 @@ check_pl:  IF (do_plumerise) THEN    ! if the namelist option is set for plumeri
                  if(errflg/=0) return
 
                case (2)
-                  CALL plumerise_sofiev(kte,1,1,1,1,1,1,                   & 
+                  CALL plumerise_sofiev(kte,                               & 
                                         u_in, v_in, w_in, theta_in, pi_in, &
                                         rho_phyin, qv_in,                  &
                                         zmid, z_lev,                       & 
                                         frp_inst(i,j),                     & 
                                         xlat(i,j), xlong(i,j),             &
-                                        k_min(i,j), k_max(i,j), ierr,      & 
+                                        k_min(i,j), k_max(i,j), errflg,    & 
                                         kpbl_in = kpbl(i,j), cp_in=con_cp )
-                  if(ierr/=0) return
+                  if(errflg/=0) return
 
                case (3)
-                  CALL plumerise_briggs(kte,1,1,1,1,1,1,                   & 
+                  CALL plumerise_briggs(kte,                               & 
                                         u_in, v_in, w_in, theta_in, pi_in, &
                                         rho_phyin, qv_in,                  &
                                         zmid, z_lev,                       &
                                         frp_inst(i,j),                     &
                                         xlat(i,j), xlong(i,j),             &
-                                        k_min(i,j), k_max(i,j), ierr,      & 
+                                        k_min(i,j), k_max(i,j), errflg,    & 
                                         kpbl_in = kpbl(i,j), cp_in=con_cp )
-                  if(ierr/=0) return
+                  if(errflg/=0) return
 
                case (4)
                   kmin_f = 1; kmax_f = 2
@@ -172,10 +172,10 @@ check_pl:  IF (do_plumerise) THEN    ! if the namelist option is set for plumeri
                                         zmid, z_lev,                       & 
                                         frp_inst(i,j),                     & ! FRP in W
                                         xlat(i,j), xlong(i,j),             &
-                                        kmin_s, kmax_s, ierr,      & 
+                                        kmin_s, kmax_s, errflg,      & 
                                         kpbl_in = kpbl(i,j), cp_in=con_cp,  &
                                         hp_out = hp_s )
-                  if(ierr/=0) return
+                  if(errflg/=0) return
 
                   kmin_b = 2; kmax_b = 3;
                   CALL plumerise_briggs(kte,                               & 
@@ -184,10 +184,10 @@ check_pl:  IF (do_plumerise) THEN    ! if the namelist option is set for plumeri
                                         zmid, z_lev,                       &
                                         frp_inst(i,j),                     &
                                         xlat(i,j), xlong(i,j),             &
-                                        kmin_b, kmax_b, ierr,      & 
+                                        kmin_b, kmax_b, errflg,      & 
                                         kpbl_in = kpbl(i,j), cp_in=con_cp,  &
                                         hp_b84 = hp_b84 )
-                  if(ierr/=0) return
+                  if(errflg/=0) return
 
                   call hybrid_weights_and_height(kte,                               & 
                                                  u_in, v_in, w_in, theta_in, qv_in, & 
@@ -201,7 +201,8 @@ check_pl:  IF (do_plumerise) THEN    ! if the namelist option is set for plumeri
                 ! SRB: Distribute emissions in the first two layers if no plumerise option is selected
                  k_min(i,j) = 1
                  k_max(i,j) = 2
-              
+               end select
+
                kp1= k_min(i,j)
                kp2= k_max(i,j)   
 
