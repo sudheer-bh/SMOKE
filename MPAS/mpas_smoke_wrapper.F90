@@ -38,7 +38,7 @@ contains
            num_chem              , chemistry_start             , chem           ,            &
            config_extra_chemical_tracers,                                                    &
            kanthro    , kbio, kfire, kvol, krwc,                                             &
-           config_ultrafine, config_coarse,                                                  &
+           config_ultrafine, config_coarse, extended_sd_diags,                               &
            index_smoke_ultrafine , index_smoke_fine            , index_smoke_coarse,         &
            index_dust_ultrafine  , index_dust_fine             , index_dust_coarse,          &
            index_ssalt_fine      , index_ssalt_coarse          ,                             &
@@ -267,7 +267,7 @@ contains
      logical,intent(in)               :: do_mpas_hab
      logical,intent(in)               :: do_mpas_rwc
      character(len=*),intent(in)      :: config_extra_chemical_tracers
-     logical,intent(in)               :: config_ultrafine, config_coarse
+     logical,intent(in)               :: config_ultrafine, config_coarse, extended_sd_diags
      logical,intent(in)               :: calc_bb_emis_online
      integer,intent(in)               :: hwp_method
      real(RKIND),intent(in)           :: hwp_alpha
@@ -749,11 +749,12 @@ contains
                                   ims,ime, jms,jme, kms,kme,        &
                                   its,ite, jts,jte, kts,kte         )
     call mpas_log_write( ' Calculating Smoke diags ')
-    call mpas_int_sm_diag(        chem,int_sm,sm_centroid_h,sm_top,sm_bot,  &
-                                  rho_phy,dz8w,num_chem,z_at_w,     &
-                                  ids,ide, jds,jde, kds,kde,        &
-                                  ims,ime, jms,jme, kms,kme,        &
-                                  its,ite, jts,jte, kts,kte         )
+    if (extended_sd_diags .ne. 'off') then
+       call mpas_int_sm_diag(        chem,int_sm,sm_centroid_h,sm_top,sm_bot,  &
+                                     rho_phy,dz8w,num_chem,z_at_w,     &
+                                     ids,ide, jds,jde, kds,kde,        &
+                                     ims,ime, jms,jme, kms,kme,        &
+                                     its,ite, jts,jte, kts,kte         )
     
 
     if (do_mpas_smoke) then
