@@ -756,7 +756,7 @@ contains
                                      ims,ime, jms,jme, kms,kme,        &
                                      its,ite, jts,jte, kts,kte         )
     
-
+    endif
     if (do_mpas_smoke) then
     ! UPP/MPASSIT expects FRP in MW
     do j=jts,jte
