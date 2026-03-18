@@ -27,7 +27,7 @@ subroutine plume_rise_briggs_rwc( wind_10m, T_1, T_2, PBL_H, zmid, EFF_H, kmax, 
         REAL(RKIND), INTENT(IN)  :: zmid(:)  ! w point height AGL [m]
         INTEGER,     INTENT(IN)  :: kts, kte
         REAL(RKIND), INTENT(OUT) :: EFF_H    ! Effective plume height [m]
-        INTEGER,     INTENT(OUT) :: kmax     ! Model level for effective plume height
+        INTEGER,     INTENT(OUT) :: k, kmax     ! Model level for effective plume height
 
         ! Local variables
         REAL(RKIND) :: Fb, Vs, Ds, Ts, Hs  ! Buoyancy forcing, Stack exit vel, Stack dia, Stack exit temp, Stack height
