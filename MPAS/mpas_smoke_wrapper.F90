@@ -267,7 +267,8 @@ contains
      logical,intent(in)               :: do_mpas_hab
      logical,intent(in)               :: do_mpas_rwc
      character(len=*),intent(in)      :: config_extra_chemical_tracers
-     logical,intent(in)               :: config_ultrafine, config_coarse, extended_sd_diags
+     logical,intent(in)               :: config_ultrafine, config_coarse 
+     character(len=*),intent(in)      :: extended_sd_diags
      logical,intent(in)               :: calc_bb_emis_online
      integer,intent(in)               :: hwp_method
      real(RKIND),intent(in)           :: hwp_alpha
